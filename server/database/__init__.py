@@ -1,1 +1,1 @@
-from backend.database.database_instance import db
+from database.database_instance import db

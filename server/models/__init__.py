@@ -1,2 +1,2 @@
-from backend.models.user import User
-from backend.models.group import Group
+from models.user import User
+from models.group import Group

@@ -1,6 +1,6 @@
 from tinydb import Query
-from backend.models import User
-from backend.database import db
+from models import User
+from database import db
 
 user_db = db.table("users")
 

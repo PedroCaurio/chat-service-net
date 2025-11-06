@@ -1,2 +1,2 @@
-from backend.repositories.user_repository import UserRepository
-from backend.repositories.group_repository import GroupRepository
+from repositories.user_repository import UserRepository
+from repositories.group_repository import GroupRepository
