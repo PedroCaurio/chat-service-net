@@ -1,6 +1,6 @@
 from tinydb import Query
-from backend.models import Group
-from backend.database import db
+from server.models import Group
+from server.database import db
 import uuid
 
 group_db = db.table("groups")
