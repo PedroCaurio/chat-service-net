@@ -4,7 +4,7 @@ import json
 from dotenv import load_dotenv
 from registry import get_command
 
-from services import action 
+from services import action, login
 
 load_dotenv()
 HOST = os.getenv("HOST", "127.0.0.1")

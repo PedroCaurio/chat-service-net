@@ -48,3 +48,12 @@ class UserRepository:
     def user_exists(username: str) -> bool:
         result = user_db.get(Query().username == username)
         return result is not None
+    
+    @staticmethod
+    def login(username: str, password: str) -> User | None:
+        UserQ = Query()
+        result = user_db.get(UserQ.username == username)
+
+        if result and result["password"] == password:
+            return User.from_dict(result)
+        return None
