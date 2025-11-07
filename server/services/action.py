@@ -25,6 +25,10 @@ def update_user(new_user: dict) -> bool:
 def delete_user(user_id: str) -> bool:
     return UserRepository.delete_user_by_id(user_id)
 
+def send_private_message(sender_id: str, receiver_id: str, message: str) -> bool:
+    ... # Placeholder for sending private message logic
+    return True
+
 # User - Group Actions
 
 @register_command("action", "create_group") 
@@ -59,6 +63,9 @@ def add_member(group_id: str, user_id: str) -> bool:
 def kick_member(group_id: str, user_id: str) -> bool:
     return GroupRepository.remove_user_from_group(group_id, user_id)
 
+def send_group_message(sender_id: str, group_id: str, message: str) -> bool:
+    ... # Placeholder for sending group message logic
+    return True
 
 # Misc/Test Actions
 
