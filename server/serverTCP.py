@@ -5,64 +5,78 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from server.repositories.user_repository import UserRepository
+
 HOST = str(os.getenv("HOST", "0.0.0.0")) # 
 PORT = int(os.getenv("PORT", 12345))
 
+
 # Lista para manter todos os sockets de clientes conectados
-clients = [] 
+clients = {}  # agora é {user_id: conn}
 lock = threading.Lock() # Lock para sincronizar o acesso a lista de clientes, por que 
 # ele faz que apenas uma thread por vez pode acessar a lista. Depois tenho que ler a documentação certinho sobre lock
 # por que se várias threads tentarem modificar a lista tem risco de dar problema
 
+# att 2 agora usa a implementação de user do Felipe
+
 # broadcast é a função que envia mensagens para todos os clientes conectados
 
-def broadcast(mensagem_bytes, socket_remetente):
-    """ Envia uma mensagem para todos os clientes, exceto ele mesmo """
-    with lock: # 
-        for client in clients:
-            if client != socket_remetente:
+def broadcast(mensagem_bytes, remetente_user_id): # Chat geral
+    """Envia uma mensagem para todos os clientes conectados, exceto o remetente."""
+    with lock:
+        for client_id, client_conn in clients.items():
+            if client_id != remetente_user_id:
                 try:
-                    client.sendall(mensagem_bytes)
+                    client_conn.sendall(mensagem_bytes)
                 except Exception as e:
-                    print(f" Não foi possível enviar mensagem {e}")
+                    print(f"Não foi possível enviar mensagem para {client_id}: {e}")
                     
              
-# função que vai lidar com cada cliente em uma thread separada    
+# função que vai lidar com cada cliente em uma thread separada  
+# ela espera o user_id, valida, e depois processa mensagens, faz broadcast etc  
 def thread_client(conn, addr):
     
     """ Função que roda em uma thread para cada cliente. """
-    addr_str = f"{addr[0]}:{addr[1]}"
-    print(f"{addr_str} conectado.")
-
-    # coloca o novo cliente a lista clients = []
-    with lock:
-        clients.append(conn)
-
+    user_id = None
     try:
+        conn.sendall(b'Conecte com seu user_id:')
+        user_id_data = conn.recv(1024).decode("utf-8").strip() # o user_id_data é a string temporaria que vai receber
+                                                              # o user_id enviado pelo cliente e se for valido
+                                                              # vai ser armazenado na variavel user_id
+
+        # Valida user_id usando UserRepository
+        if not UserRepository.get_user_by_id(user_id_data):
+            conn.sendall(b'User invalido')
+            conn.close()
+            return
+
+        user_id = user_id_data # armazena o user_id validado 
+        with lock:
+            clients[user_id] = conn
+        print(f"Usuario {user_id} conectado de {addr}") #  log da conexão
+
+        conn.sendall(b'Conectado ao chat geral!\n')
+        
         while True:
             data = conn.recv(1024)
             if not data:
-                # Se não houver dados, o cliente desconecta 
-                print(f" Cliente {addr_str} desconectou.")
+                print(f"Usuario {user_id} desconectou")
                 break
 
-            message = data.decode("utf-8")
-            print(f"[MENSAGEM DE {addr_str}] {message}")
-            
-            # Retransmite a mensagem pra todo mundo, tirando ele mesmo
-            broadcast(data, conn)
+            mensagem = data.decode("utf-8")
+            print(f"[{user_id}@{addr}] {mensagem}")
+
+            # envio da mensagem para todos os outros
+            broadcast(f"[{user_id}]: {mensagem}".encode("utf-8"), user_id)
 
     except ConnectionResetError:
-        print(f" Conexão perdida com o cliente {addr_str}.")
+        print(f"Conexão perdida com o usuario {user_id}")
     except Exception as e:
-        print(f" Erro inesperado com {addr_str}: {e}")
-    
+        print(f"Erro inesperado com {user_id}: {e}")
     finally:
-        # Tira o cliente da lista quando ele sair
         with lock:
-            if conn in clients:
-                clients.remove(conn)
-        # Fecha a conexão dele
+            if user_id in clients:
+                del clients[user_id]
         conn.close()
 
 def start_server():
