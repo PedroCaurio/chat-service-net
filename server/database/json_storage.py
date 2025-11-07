@@ -7,13 +7,13 @@ import uuid # é pra gerar ids unicos para usuarios, grupos, mensagens etc
             # não acho que vai acontecer né XDD mas é legal ter isso no trab
             # att 2 ah ja tem os ids unicos no GroupRepository e UserRepository
             # depois tem que atualizar o group_repository.py e user_repository.py pra usar esse 
-            # json.py
+            # json_storage.py
+from .lock_manager import lock_collections
+# .centralizei os locks no lock_manager.py
 
 BASE_DIR = os.path.join(os.path.dirname(__file__), "data")
 # base_dir = diretorio onde os arquivos json vão ser salvos, ah não ser que queiram mudar o
 # lugar de onde guardar os arquivos json
-
-lock = threading.Lock() # lock é pra garantir que só uma thread acesse o arquivo json por vez
 
 def ensure_dir(path): # garante que o diretório existe
     os.makedirs(path, exist=True)
@@ -52,7 +52,8 @@ def load_collection(name, default_create=list):
     default_create: função para o valor padrão quando o arquivo não existe
     """
     path = file_path(name)
-    with lock:
+    # lock por-coleção para permitir concorrência entre coleções diferentes
+    with lock_collections([name]):
         return read_json(path, default_create())
         # é uma função que le o json do path, ou cria o default (lista vazia por padrão) caso não exista 
 
@@ -60,7 +61,7 @@ def load_collection(name, default_create=list):
 def save_collection(name, data):
     """Salva uma coleção objeto JSON."""
     path = file_path(name)
-    with lock:
+    with lock_collections([name]):
         write_json(path, data) # chama a função que salva o json no path
 
 
