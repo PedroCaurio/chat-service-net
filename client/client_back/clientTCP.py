@@ -9,9 +9,9 @@ HOST = str(os.getenv("HOST", "127.0.0.1"))
 PORT = int(os.getenv("PORT", 12345))
 
 msg = {
-    "type": "action",
+    "type": "login",
     "payload": {
-        "command": "create_user",
+        "command": "login",
         "username": "aaaaaa",
         "password": "aaaa"
     }
