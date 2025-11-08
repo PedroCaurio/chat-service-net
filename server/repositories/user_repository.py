@@ -66,3 +66,13 @@ class UserRepository:
             user_db = db.table("users")
             result = user_db.get(Query().username == username)
         return result is not None
+
+    @staticmethod
+    def get_user_by_username(username: str) -> User | None:
+        """Retorna o objeto User para o username informado ou None se não existir."""
+        with locked_db():
+            user_db = db.table("users")
+            result = user_db.get(Query().username == username)
+        if result:
+            return User.from_dict(result)
+        return None
