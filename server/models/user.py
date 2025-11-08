@@ -4,7 +4,7 @@ from dataclasses import dataclass
 class User:
     username: str
     password: str
-    user_id: str | None = None
+    user_id: str
 
     @staticmethod
     def from_dict(data: dict) -> 'User':
