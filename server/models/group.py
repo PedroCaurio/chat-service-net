@@ -6,7 +6,7 @@ class Group:
     users: list[str]
     name: str
     created_at: int
-    group_id: str | None = None
+    group_id: str
 
     @staticmethod
     def from_dict(data: dict) -> 'Group':
