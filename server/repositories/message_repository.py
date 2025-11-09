@@ -1,7 +1,7 @@
 from typing import List, Dict, Any
 from tinydb import Query
-from server.database.database_instance import db, locked_db
-from server.models.message import Message
+from database.database_instance import db, locked_db
+from models.message import Message
 import uuid
 
 

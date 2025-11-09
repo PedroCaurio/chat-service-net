@@ -1,8 +1,8 @@
-from server.repositories import GroupRepository, UserRepository, MessageRepository
-from server.models.message import Message
+from repositories import GroupRepository, UserRepository, MessageRepository
+from models.message import Message
 from datetime import datetime
-from server.models.message import Message
-from server.services.chat_private import send_private_message as helper_send_private
+from models.message import Message
+from services.chat_private import send_private_message as helper_send_private
 
 # o json das mensagens vai ter que conter o group_id para saber para qual grupo enviar
 

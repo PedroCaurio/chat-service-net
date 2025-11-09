@@ -5,11 +5,11 @@ import json
 from dotenv import load_dotenv
 
 load_dotenv()
-from server.models.message import Message
-from server.repositories import UserRepository, GroupRepository
-from server.database.lock_manager import get_lock # get_lock pega o lock global do recurso 'clients'
-from server.services.chat_private import send_private_message, get_private_messages
-from server.services.groups import send_group_message, get_group_messages
+from models.message import Message
+from repositories import UserRepository, GroupRepository
+from database.lock_manager import get_lock # get_lock pega o lock global do recurso 'clients'
+from services.chat_private import send_private_message, get_private_messages
+from services.groups import send_group_message, get_group_messages
 
 
 HOST = str(os.getenv("HOST", "0.0.0.0")) 

@@ -1,3 +1,3 @@
-from backend.repositories.user_repository import UserRepository
-from backend.repositories.group_repository import GroupRepository
-from backend.repositories.message_repository import MessageRepository
+from repositories.user_repository import UserRepository
+from repositories.group_repository import GroupRepository
+from repositories.message_repository import MessageRepository

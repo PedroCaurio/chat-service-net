@@ -1,1 +1,1 @@
-from backend.database.database_instance import db, locked_db
+from database.database_instance import db, locked_db

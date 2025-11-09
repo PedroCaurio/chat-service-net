@@ -13,8 +13,8 @@ Observação: execute a partir da raiz do projeto. Se tiver problema de imports,
 """
 import argparse
 import uuid
-from server.models.user import User
-from server.repositories.user_repository import UserRepository
+from ..models.user import User
+from ..repositories.user_repository import UserRepository
 
 ## Eu pedi por meio de auxiliares fazerem um script pra criar um usuarios só 
 # pra testar rapidamente 

@@ -4,8 +4,8 @@ por se comunicar com os dados dos usuários no TinyDB.
 '''
 
 from tinydb import Query
-from backend.models import User
-from backend.database.database_instance import db, locked_db
+from models.user import User
+from database.database_instance import db, locked_db
 
 user_db = db.table("users")
 
