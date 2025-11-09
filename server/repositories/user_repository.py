@@ -1,3 +1,8 @@
+'''
+Camada de Abstração para facilitar o desenvolvimento. Sendo responsável apenas
+por se comunicar com os dados dos usuários no TinyDB.
+'''
+
 from tinydb import Query
 from models import User
 from database import db
