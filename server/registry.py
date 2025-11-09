@@ -1,3 +1,7 @@
+'''
+Responsável por desacoplar o loop principal da lógica de comandos através de um decorador.
+Além disso, outras funções para facilitar o uso estão incluídas
+'''
 from functools import wraps
 from typing import Any, Callable
 

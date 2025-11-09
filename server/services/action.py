@@ -1,3 +1,8 @@
+'''
+Camada para os comandos, sendo responsável pela lógica dos comandos que o servidor
+pode executar.
+'''
+
 import uuid
 from server.models import User, Group
 from server.repositories import UserRepository, GroupRepository

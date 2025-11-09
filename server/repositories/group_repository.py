@@ -1,3 +1,8 @@
+'''
+Camada de Abstração para facilitar o desenvolvimento. Sendo responsável apenas
+por se comunicar com os dados dos grupos no TinyDB.
+'''
+
 from tinydb import Query
 from server.models.group import Group
 from server.database.database_instance import db, locked_db

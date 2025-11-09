@@ -57,7 +57,7 @@ def main():
 
             print(f"[THREAD] Novo cliente em {addr}, total de threads ativas: {threading.active_count() - 1}")
 
-            handle_client(conn, addr)
+            #handle_client(conn, addr)
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,15 @@
+'''
+Cria a forma dos dados de grupo que será armazenado no banco de dados.
+'''
+
 from dataclasses import dataclass
 
+
+''' Cria a estrutura com um decorador de dataclass, que facilita
+a escrita pois implementa automaticamente alguns métodos como __init__ e __repr__.
+Essa classe também possuí métodos para tradução com o banco de dados, já que ele armazena
+JSON/Dicts.
+'''
 @dataclass
 class Group:
     admin: str
