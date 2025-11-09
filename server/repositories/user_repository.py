@@ -1,11 +1,10 @@
 from tinydb import Query
-from server.models.user import User
-from server.database.database_instance import db, locked_db
-# locked_db é o context manager que adquire o lock global do DB
+from backend.models import User
+from backend.database.database_instance import db, locked_db
 
-def id_query(user_id: str):
-    return Query().user_id == user_id
+user_db = db.table("users")
 
+def id_query(user_id: str): return Query().user_id == user_id
 
 class UserRepository:
 
@@ -66,7 +65,7 @@ class UserRepository:
             user_db = db.table("users")
             result = user_db.get(Query().username == username)
         return result is not None
-
+    
     @staticmethod
     def get_user_by_username(username: str) -> User | None:
         """Retorna o objeto User para o username informado ou None se não existir."""

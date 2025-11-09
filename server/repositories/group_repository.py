@@ -1,11 +1,11 @@
 from tinydb import Query
 from server.models.group import Group
 from server.database.database_instance import db, locked_db
-# locked_db é o context manager que adquire o lock global do DB
+import uuid
 
-def id_query(group_id: str):
-    return Query().group_id == group_id
+group_db = db.table("groups")
 
+def id_query(group_id: str): return Query().group_id == group_id
 
 class GroupRepository:
 
@@ -62,6 +62,10 @@ class GroupRepository:
             return group.users
         return None
 
+    @staticmethod
+    def delete_group_by_id(group_id: str) -> None:
+        group_db.remove(doc_id = group_id)
+    
     @staticmethod
     def get_user_groups(user_id: str) -> list[Group]:
         with locked_db():

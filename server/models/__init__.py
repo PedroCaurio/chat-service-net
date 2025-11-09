@@ -1,3 +1,3 @@
-from .user import User
-from .group import Group
-from .message import Message
+from backend.models.user import User
+from backend.models.group import Group
+from backend.models.message import Message
