@@ -1,9 +1,9 @@
 import uuid
-from models import User
-from repositories import UserRepository
+from server.models import User
+from server.repositories import UserRepository
 from datetime import datetime
 
-from registry import register_command
+from server.registry import register_command
 
 @register_command("login")
 def login(username: str, password: str):
