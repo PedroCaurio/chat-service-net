@@ -1,3 +1,8 @@
+'''
+Arquivo principal do cliente. Responsável por ouvir e enviar requisições para o servidor
+Utiliza threads para ouvir o servidor e ao mesmo tempo permitir interações
+do usuário.
+'''
 import socket
 import os
 from dotenv import load_dotenv
@@ -14,9 +19,11 @@ PORT = int(os.getenv("PORT", 12345))
 
 USER = None
 
+''' Envia o dicionário passado como data para o servidor'''
 def send_json(sock, data):
     sock.sendall(json.dumps(data).encode())
 
+''' Função usada pela Thread para ficar escutando o servidor '''
 def listen_server(sock):
     while True:
         try:
@@ -30,7 +37,7 @@ def listen_server(sock):
                 print(msg)
         except:
             break
-
+''' Função que conecta ao servidor, roda as threads e recebe os inputs do usuário'''
 def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((HOST, PORT))
