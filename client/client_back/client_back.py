@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from services import login
 import json
 import threading
+from PyQt6.QtCore import QObject, pyqtSignal
 
 from registry import get_command
 
