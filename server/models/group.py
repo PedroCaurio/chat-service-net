@@ -36,5 +36,3 @@ class Group:
             "name": self.name,
             "created_at": self.created_at
         }
-
-
