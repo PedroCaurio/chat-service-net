@@ -83,8 +83,9 @@ def kick_member(group_id: str, user_id: str) -> bool:
     return GroupRepository.remove_user_from_group(group_id, user_id)
 
 
+@register_command("send_group_message")
 def send_group_message(sender_id: str, group_id: str, message: str) -> bool:
-    return True
+    return chat_private.send_group_message(sender_id, group_id, message)
 
 
 # Misc/Test Actions
