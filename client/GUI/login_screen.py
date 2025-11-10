@@ -1,3 +1,7 @@
+#
+#       TRABALHO EM ANDAMENTO - MTA IA AINDA
+#
+
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, 
     QLabel, QLineEdit, QPushButton, QMessageBox
