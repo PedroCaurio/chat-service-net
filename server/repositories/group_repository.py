@@ -4,8 +4,8 @@ por se comunicar com os dados dos grupos no TinyDB.
 '''
 
 from tinydb import Query
-from models.group import Group
-from database.database_instance import db, locked_db
+from server.models.group import Group
+from server.database.database_instance import db, locked_db
 import uuid
 
 group_db = db.table("groups")

@@ -1,6 +1,6 @@
 import uuid
-from models import User, Group
-from repositories import UserRepository, GroupRepository
+from server.models import User, Group
+from server.repositories import UserRepository, GroupRepository
 from datetime import datetime
 
 def create_user(username: str, password: str):

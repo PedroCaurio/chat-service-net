@@ -1,7 +1,7 @@
 from typing import List, Dict, Any
 from tinydb import Query
-from database.database_instance import db, locked_db
-from models.message import Message
+from server.database.database_instance import db, locked_db
+from server.models.message import Message
 import uuid
 
 
@@ -16,7 +16,7 @@ class MessageRepository:
     """
     ## CRUD Operations
     
-    ## Att: Arthur botei o model Message nas 
+    ## Att Arthur: botei o model Message mas 
     ## O TinyDB armazena como dict, então converti na hora de salvar e recuperar
     ## Se acharem que não faz sentido fazer essa mudança, podem desfazer
     @staticmethod

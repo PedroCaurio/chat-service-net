@@ -1,1 +1,1 @@
-from database.database_instance import db, locked_db
+from server.database.database_instance import db, locked_db
