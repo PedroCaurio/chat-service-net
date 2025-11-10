@@ -2,17 +2,16 @@
 Criar uma instância única e compartilhada do banco de dados
 Utiliza o tinydb que armazena tudo em um db.json
 '''
-
+from os import getenv
 from contextlib import contextmanager
 from tinydb import TinyDB
 from .lock_manager import lock_collections
+from dotenv import load_dotenv
 
-DB_FILE_PATH = "./db.json"
+load_dotenv(override=True)
 
-def open_database() -> TinyDB:
-    return TinyDB(DB_FILE_PATH)
-
-db = open_database()
+DB_FILE_PATH = getenv("DB_FILE_PATH", "./db.json")
+db = TinyDB(DB_FILE_PATH)
 
 
 @contextmanager

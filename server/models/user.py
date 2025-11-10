@@ -3,7 +3,7 @@ Cria a forma dos dados do usuário que será armazenado no banco de dados.
 '''
 
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
 
 ''' Cria a estrutura com um decorador de dataclass, que facilita
@@ -11,7 +11,6 @@ a escrita pois implementa automaticamente alguns métodos como __init__ e __repr
 Essa classe também possuí métodos para tradução com o banco de dados, já que ele armazena
 JSON/Dicts.
 '''
-@dataclass
 @dataclass
 class User:
     username: str
@@ -27,8 +26,4 @@ class User:
         )
 
     def to_dict(self) -> dict:
-        return {
-            "user_id": self.user_id,
-            "username": self.username,
-            "password": self.password
-        }
+        return asdict(self)

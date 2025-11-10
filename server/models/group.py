@@ -2,7 +2,7 @@
 Cria a forma dos dados de grupo que será armazenado no banco de dados.
 '''
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
 
 ''' Cria a estrutura com um decorador de dataclass, que facilita
@@ -29,10 +29,4 @@ class Group:
         )
     
     def to_dict(self) -> dict:
-        return {
-            "group_id": self.group_id,
-            "admin": self.admin,
-            "users": self.users,
-            "name": self.name,
-            "created_at": self.created_at
-        }
+        return asdict(self)

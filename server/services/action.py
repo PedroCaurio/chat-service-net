@@ -16,11 +16,21 @@ import server.services.chat_private as chat_private
 # User Actions
 
 
-@register_command("create_user")
-def create_user(username: str, password: str):
+@register_command("register")
+def register(username: str, password: str):
     return UserRepository.add_user(
         User(username=username, password=password, user_id=str(uuid.uuid4()))
     )
+
+@register_command("login")
+def login(username: str, password: str):
+    user = UserRepository.authenticate_user(username=username, password=password)
+    if not user:
+        return None
+    return {
+        "command" : "login",
+        "user_id" : user.user_id
+    }
 
 
 @register_command("get_user")

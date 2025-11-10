@@ -1,9 +1,7 @@
 import socket
 import os
-import json
 from dotenv import load_dotenv
 import threading
-from server.services import action, login
 from server.connection_manager import handle_connection
 
 load_dotenv()
