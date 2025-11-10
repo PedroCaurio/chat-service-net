@@ -7,7 +7,7 @@ from tinydb import Query
 from server.models.user import User
 from server.database.database_instance import db, locked_db
 
-user_db = db.table("users")
+
 
 def id_query(user_id: str): return Query().user_id == user_id
 
