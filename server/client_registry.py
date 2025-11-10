@@ -4,9 +4,8 @@ Responsabilidade: manter o mapa de clientes conectados e oferecer API thread-saf
 para registrar, desregistrar e enviar bytes aos clientes ou grupos.
 """
 from typing import Optional, List
-import threading
-from server.database.lock_manager import get_lock
-from server.repositories import GroupRepository
+from database.lock_manager import get_lock
+from repositories import GroupRepository
 
 # Lock central (usa o lock manager do projeto para consistência)
 _lock = get_lock("clients")

@@ -1,7 +1,7 @@
 import json
-from server.repositories import UserRepository
-from server import client_registry
-from server.message_handler import handle_message
+from repositories import UserRepository
+import client_registry
+from message_handler import handle_message
 
 # client_registry: gerencia conexões ativas (user_id -> socket)
 # nota: entrega de bytes é responsabilidade do client_registry; as funções

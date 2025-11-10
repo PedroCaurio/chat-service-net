@@ -1,3 +1,3 @@
-from server.repositories.user_repository import UserRepository
-from server.repositories.group_repository import GroupRepository
-from server.repositories.message_repository import MessageRepository
+from repositories.user_repository import UserRepository
+from repositories.group_repository import GroupRepository
+from repositories.message_repository import MessageRepository

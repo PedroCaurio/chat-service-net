@@ -1,12 +1,12 @@
 import json
 from typing import Optional
 
-from server.repositories import UserRepository, GroupRepository
-from server.services.chat_private import send_private_message, get_private_messages
-from server.services.chat_general import send_general_message, get_general_messages
-from server.services.groups import send_group_message, get_group_messages
-from server.models.message import Message
-from server import client_registry
+from repositories import UserRepository, GroupRepository
+from services.chat_private import send_private_message, get_private_messages
+from services.chat_general import send_general_message, get_general_messages
+from services.groups import send_group_message, get_group_messages
+from models.message import Message
+import client_registry
 
 
 def handle_message(user_id: str, envelope: dict, conn) -> Optional[dict]:

@@ -2,7 +2,7 @@ import socket
 import os
 from dotenv import load_dotenv
 import threading
-from server.connection_manager import handle_connection
+from connection_manager import handle_connection
 
 load_dotenv()
 HOST = os.getenv("HOST", "127.0.0.1")

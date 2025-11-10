@@ -1,6 +1,6 @@
-from server.repositories import GroupRepository
-from server.repositories.message_repository import MessageRepository
-from server.models import Message
+from repositories import GroupRepository
+from repositories.message_repository import MessageRepository
+from models import Message
 
 
 def send_group_message(sender_id: str, group_id: str, text: str) -> bool:

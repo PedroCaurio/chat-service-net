@@ -1,7 +1,7 @@
-from server.repositories import UserRepository
-from server.repositories.message_repository import MessageRepository
+from repositories import UserRepository
+from repositories.message_repository import MessageRepository
 from datetime import datetime
-from server.models import Message
+from models import Message
 
 
 def conversation_id(a: str, b: str) -> str:

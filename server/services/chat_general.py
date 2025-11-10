@@ -1,6 +1,6 @@
-from server.repositories.message_repository import MessageRepository
-from server.repositories import UserRepository
-from server.models import Message
+from repositories.message_repository import MessageRepository
+from repositories import UserRepository
+from models import Message
 from datetime import datetime
 
 

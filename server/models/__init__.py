@@ -1,3 +1,3 @@
-from server.models.user import User
-from server.models.group import Group
-from server.models.message import Message
+from models.user import User
+from models.group import Group
+from models.message import Message

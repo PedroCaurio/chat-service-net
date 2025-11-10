@@ -4,13 +4,13 @@ pode executar.
 '''
 
 import uuid
-from server.models.user import User
-from server.models.group import Group
-from server.repositories import UserRepository, GroupRepository
+from models.user import User
+from models.group import Group
+from repositories import UserRepository, GroupRepository
 from datetime import datetime
 
-from server.registry import register_command
-import server.services.chat_private as chat_private
+from registry import register_command
+import services.chat_private as chat_private
 
 
 # User Actions
