@@ -57,6 +57,7 @@ class LoginScreen(QWidget):
         password = self.input_pass.text()
 
         if username and password:
+            print("tem login")
             self.login_requested.emit(username, password)
         else:
             self.show_error("Preencha todos os campos.")
