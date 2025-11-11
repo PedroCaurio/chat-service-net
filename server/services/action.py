@@ -17,25 +17,22 @@ import services.chat_private as chat_private
 
 
 @register_command("register")
-def register(username: str, password: str):
+def register(username: str, password: str, **kwargs):
     return UserRepository.add_user(
-        User(username=username, password=password, user_id=str(uuid.uuid4()))
+        User(username=username, password=password)
     )
 
-@register_command("login")
-def login(username: str, password: str):
+@register_command("auth")
+def auth(username: str, password: str):
     user = UserRepository.authenticate_user(username=username, password=password)
     if not user:
-        return None
-    return {
-        "command" : "login",
-        "user_id" : user.user_id
-    }
+        return False
+    return True
 
 
 @register_command("get_user")
-def get_user(user_id: str) -> User | None:
-    return UserRepository.get_user_by_id(user_id)
+def get_user(username: str) -> User | None:
+    return UserRepository.get_user_by_id(username)
 
 
 @register_command("update_user")
@@ -44,12 +41,12 @@ def update_user(new_user: dict) -> bool:
 
 
 @register_command("delete_user")
-def delete_user(user_id: str) -> bool:
-    return UserRepository.delete_user_by_id(user_id)
+def delete_user(username: str) -> bool:
+    return UserRepository.delete_user_by_id(username)
 
 
-def send_private_message(sender_id: str, receiver_id: str, message: str) -> bool:
-    return chat_private.send_private_message(sender_id, receiver_id, message)
+def send_private_message(sender_username: str, receiver_username: str, message: str) -> bool:
+    return chat_private.send_private_message(sender_username, receiver_username, message)
 
 
 # User - Group Actions
@@ -63,14 +60,13 @@ def create_group(admin: str, name: str, users: list[str]) -> bool:
             admin=admin,
             users=users,
             created_at=datetime.now().timestamp(),
-            group_id=str(uuid.uuid4())
         )
     )
 
 
 @register_command("get_group")
-def get_group(group_id: str) -> Group | None:
-    return GroupRepository.get_group_by_id(group_id)
+def get_group(group_name: str) -> Group | None:
+    return GroupRepository.get_group_by_name(group_name)
 
 
 @register_command("update_group_name")
@@ -79,23 +75,23 @@ def update_group_name(group: dict) -> bool:
 
 
 @register_command("delete_group")
-def delete_group(group_id: str) -> bool:
-    return GroupRepository.delete_group_by_id(group_id)
+def delete_group(group_name: str) -> bool:
+    return GroupRepository.delete_group_by_name(group_name)
 
 
 @register_command("add_member")
-def add_member(group_id: str, user_id: str) -> bool:
-    return GroupRepository.add_user_to_group(group_id, user_id)
+def add_member(group_name: str, username: str) -> bool:
+    return GroupRepository.add_user_to_group(group_name, username)
 
 
 @register_command("kick_member")
-def kick_member(group_id: str, user_id: str) -> bool:
-    return GroupRepository.remove_user_from_group(group_id, user_id)
+def kick_member(group_name: str, username: str) -> bool:
+    return GroupRepository.remove_user_from_group(group_name, username)
 
 
 @register_command("send_group_message")
-def send_group_message(sender_id: str, group_id: str, message: str) -> bool:
-    return chat_private.send_group_message(sender_id, group_id, message)
+def send_group_message(sender_username: str, group_name: str, message: str) -> bool:
+    return chat_private.send_group_message(sender_username, group_name, message)
 
 
 # Misc/Test Actions

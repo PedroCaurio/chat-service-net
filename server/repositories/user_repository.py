@@ -7,7 +7,7 @@ from tinydb import Query
 from models.user import User
 from database.database_instance import db, locked_db
 
-def id_query(user_id: str): return Query().user_id == user_id
+def username_query(username: str): return Query().username == username
 
 class UserRepository:
 
@@ -26,17 +26,17 @@ class UserRepository:
         return True
 
     @staticmethod
-    def get_user_by_id(user_id: str) -> User | None:   # READ
+    def get_user_by_id(username: str) -> User | None:   # READ
         with locked_db():
-            result = UserRepository._user_db().get(id_query(user_id))
+            result = UserRepository._user_db().get(username_query(username))
         if result:
             return User.from_dict(result)
         return None
 
     @staticmethod
-    def delete_user_by_id(user_id: str) -> bool:   # DELETE
+    def delete_user_by_id(username: str) -> bool:   # DELETE
         with locked_db():
-            removed = UserRepository._user_db().remove(id_query(user_id))
+            removed = UserRepository._user_db().remove(username_query(username))
         return len(removed) > 0
 
     @staticmethod
@@ -44,13 +44,13 @@ class UserRepository:
         with locked_db():
             # existe o user_id?
             user_db = UserRepository._user_db()
-            if not user_db.contains(id_query(user.user_id)):
+            if not user_db.contains(username_query(user.username)):
                 return False
             # username duplicado em outro id?
-            dup = user_db.search((Query().username == user.username) & (Query().user_id != user.user_id))
+            dup = user_db.search((Query().username == user.username) & (Query().user_id != user.username))
             if dup:
                 return False
-            user_db.update(user.to_dict(), cond=id_query(user.user_id))
+            user_db.update(user.to_dict(), cond=username_query(user.username))
         return True
 
 

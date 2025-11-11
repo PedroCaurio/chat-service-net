@@ -9,16 +9,16 @@ def _conversation_key() -> str:
 	return "general"
 
 
-def send_general_message(sender_id: str, text: str) -> Message | None:
+def send_general_message(sender_username: str, text: str) -> Message | None:
 	"""Valida remetente, cria e persiste uma mensagem no chat geral.
 
 	Retorna o objeto Message persistido ou None em caso de falha.
 	"""
 	# valida existência do remetente
-	if not UserRepository.get_user_by_id(sender_id):
+	if not UserRepository.get_user_by_username(sender_username):
 		return None
 
-	msg = Message(from_=sender_id, to="general", text=text)
+	msg = Message(from_=sender_username, to="general", text=text)
 	key = _conversation_key()
 	MessageRepository.append_message(key, msg)
 	return msg

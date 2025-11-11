@@ -16,7 +16,6 @@ def send_group_message(sender_id: str, group_id: str, text: str) -> bool:
     MessageRepository.append_message(group_id, msg)
     return True
 
-
 def get_group_messages(group_id: str):
     """Retorna as mensagens persistidas do grupo (lista de Message)."""
     return MessageRepository.get_messages(group_id)

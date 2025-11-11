@@ -2,6 +2,9 @@ import json
 from repositories import UserRepository
 import client_registry
 from message_handler import handle_message
+from services import action
+
+from registry import get_command
 
 # client_registry: gerencia conexões ativas (user_id -> socket)
 # nota: entrega de bytes é responsabilidade do client_registry; as funções
@@ -10,53 +13,44 @@ from message_handler import handle_message
 
 def handle_connection(conn, addr):
     """Handler de conexão que roda em uma thread. Recebe a socket e o endereço."""
-    user_id = None
+    username = None
     try:
-        conn.sendall(b'Conecte com seu user_id:')
-        user_id_data = conn.recv(1024).decode("utf-8").strip()
-
-        user_obj = UserRepository.get_user_by_id(user_id_data)
-        if user_obj is None:
-            user_obj = UserRepository.get_user_by_username(user_id_data)
-            if user_obj is None:
-                conn.sendall(b'User invalido')
-                conn.close()
-                return
-        user_id = user_obj.user_id
-        client_registry.register_client(user_id, conn)
-        print(f"Usuario {user_id} conectado de {addr}")
-        conn.sendall(b'Conectado ao chat geral!\n')
-
         while True:
             data = conn.recv(1024)
             if not data:
-                print(f"Usuario {user_id} desconectou")
+                print(f"Usuario {username} desconectou")
                 break
             try:
-                envelope = json.loads(data.decode("utf-8"))
-            except json.JSONDecodeError:
-                conn.sendall(b"Formato JSON invalido\n")
-                continue
+                msg = json.loads(data.decode("utf-8"))
+                msg_type = msg.get("type")
+                payload = msg.get("payload")
 
-            response = handle_message(user_id, envelope, conn)
+                if msg_type == "request" and payload:
+                    command = payload.get("command")
+                    func = get_command(command)
+                    if func:
+                        result = func(conn=conn, **payload)
+                        response = result
+
+                    else:
+                        response = {"type": "error", "payload": {"message": f"Comando '{command}' não encontrado."}}
+
+                else:
+                    response = {"type": "error", "payload": {"message": "Tipo de mensagem não suportado."}}
+
+            except Exception as e:
+                response = {"type": "error", "payload": {"message": str(e)}}
+
             if response:
-                try:
-                    conn.sendall((json.dumps(response)).encode("utf-8"))
-                except Exception:
-                    pass
-            if response.get("status") == "error":
-                try:
-                    conn.sendall(f"Erro: {response.get('message')}\n".encode("utf-8"))
-                except Exception:
-                    pass
+                conn.sendall(json.dumps(response).encode())
 
     except ConnectionResetError:
-        print(f"Conexão perdida com o usuario {user_id}")
+        print(f"Conexão perdida com o usuario {username}")
     except Exception as e:
-        print(f"Erro inesperado com {user_id}: {e}")
+        print(f"Erro inesperado com {username}: {e}")
     finally:
         try:
-            client_registry.unregister_client(user_id)
+            client_registry.unregister_client(username)
         except Exception:
             pass
         conn.close()
