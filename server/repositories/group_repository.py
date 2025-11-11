@@ -32,6 +32,14 @@ class GroupRepository:
         if result:
             return Group.from_dict(result)
         return None
+    
+    @staticmethod
+    def get_group_by_name(group_name: str) -> Group | None:
+        with locked_db():
+            result = GroupRepository._group_db().get(Query().name.test(lambda u: u.lower() == group_name.lower()))
+        if result:
+            return Group.from_dict(result)
+        return None
 
     @staticmethod
     def update_group_name(group: Group) -> bool:   # UPDATE

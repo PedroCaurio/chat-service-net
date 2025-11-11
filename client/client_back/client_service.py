@@ -80,7 +80,7 @@ class ClientService(QObject):
     def __init__(self, main_window: QMainWindow):
         super().__init__()
         self.user_id = None
-        self.worker = NetworkWorker(str(os.getenv("SERVER_IP", "127.0.0.1")), int(os.getenv("PORT", 12345)))
+        self.worker = NetworkWorker(str(os.getenv("SERVER_IP", "127.0.0.1")), int(os.getenv("PORT", 12346)))
         self.initState(main_window)
     
 
@@ -116,11 +116,22 @@ class ClientService(QObject):
         self.worker.data_received.connect(self.handle_data)
         self.worker.disconnected.connect(self.handle_disconnect)
 
+        # --- Conexão Criação de Grupo ----
+        main_window.create_group_screen.create_group_requested.connect(self.manage_group)
 
         # ---- Inicializa a Thread de recebimento dos dados ----
         self.worker.start()
         
-    
+    def manage_group(self, group_name, new_user, user_id):
+        msg = {
+            "type": "group",
+            "payload": { 
+                "user_id": user_id,
+                "group_name": group_name,
+                "new_user": new_user
+            }
+        }
+        self.send_json(msg)
     @pyqtSlot(bytes)
     def handle_data(self,data):
         '''
@@ -129,14 +140,16 @@ class ClientService(QObject):
         for msg_str in self.decode_messages(data):
             try:
                 msg = json.loads(msg_str)
-                command = msg.get("type")
-                args = msg.get("payload")
+                
                 print("mensagem recebida:", msg)
-                func = 'handle_' + command
-                try:
-                    getattr(self, func)(**args)
-                except:
-                    getattr(self, func, lambda _: print(f"Tipo de mensagem não tratada: {command}"))(msg)
+                if msg:
+                    command = msg.get("type")
+                    args = msg.get("payload")
+                    func = 'handle_' + command
+                    try:
+                        getattr(self, func)(**args)
+                    except:
+                        getattr(self, func, lambda _: print(f"Tipo de mensagem não tratada: {command}"))(msg)
             except json.JSONDecodeError:
                 print(f"JSON inválido recebido: {msg_str}")
     

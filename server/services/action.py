@@ -105,6 +105,20 @@ def kick_member(group_id: str, user_id: str) -> bool:
 def send_group_message(sender_id: str, group_id: str, message: str) -> bool:
     return chat_private.send_group_message(sender_id, group_id, message)
 
+@register_command("group")
+def group(group_name, new_user, user_id):
+    print("group name:" ,group_name)
+    group = GroupRepository.get_group_by_name(group_name)
+    print(group)
+    if not group:
+        new_group = Group(admin=user_id, users=[user_id], name=group_name, group_id=group_name)
+        GroupRepository.add_group(new_group)
+    GroupRepository.add_user_to_group(group_name, new_user)
+
+    # Se grupo n existe, criar e inserir usuario
+
+    # Caso já exista, só insere o usuário
+
 @register_command("general_message")
 def general_message(origin, message):
     user_id = UserRepository.get_user_by_username(origin).user_id
