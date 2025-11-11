@@ -1,7 +1,11 @@
+'''
+    Entrada do client. Cria a janela e o serviço principal do client
+'''
+
 import sys
 from PyQt6.QtWidgets import QApplication
 from client_back.client_service import ClientService 
-from gui.main_window import MainWindow
+from GUI.main_window import MainWindow
 from client_back.data_helper import data_helper
 
 if __name__ == "__main__":

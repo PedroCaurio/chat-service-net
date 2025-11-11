@@ -1,5 +1,5 @@
 '''
-Permite apenas uma tela por vez
+Permite apenas uma tela por vez, é a stack do PyQt
 '''
 
 from PyQt6.QtWidgets import QMainWindow, QStackedWidget

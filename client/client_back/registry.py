@@ -1,6 +1,6 @@
 '''
 Responsável por desacoplar o loop principal da lógica de comandos através de um decorador.
-Além disso, outras funções para facilitar o uso estão incluídas
+Além disso, outras funções para facilitar o uso estão incluídas. Acabamos não usando para o Client
 '''
 from functools import wraps
 from typing import Any, Callable

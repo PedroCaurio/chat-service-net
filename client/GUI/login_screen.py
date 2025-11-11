@@ -1,3 +1,6 @@
+'''
+Tela para login e registro (n conseguimos implementar o registro)
+'''
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, 
     QLabel, QLineEdit, QPushButton, QMessageBox

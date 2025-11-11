@@ -1,3 +1,6 @@
+'''
+Auxiliar para persistência das mensagens
+'''
 from enum import Enum
 from PyQt6.QtCore import pyqtSlot
 from os.path import isfile

@@ -1,7 +1,5 @@
 '''
-Arquivo principal do cliente. Responsável por ouvir e enviar requisições para o servidor
-Utiliza threads para ouvir o servidor e ao mesmo tempo permitir interações
-do usuário.
+Arquivo antigo, ignorar.
 '''
 import socket
 import os

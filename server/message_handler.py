@@ -1,3 +1,7 @@
+'''
+Handler antigo, ignorar.
+'''
+
 import json
 from typing import Optional
 

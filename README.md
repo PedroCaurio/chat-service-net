@@ -15,7 +15,27 @@ Projeto para disciplina de Redes de Computadores com o objetivo de desenvolver u
    ```bash
    cp .env.example .env
    ```
+3. **Possible errors**:
+   Caso dê algum erro de plugin do qt no linux, rodar esses comandos
 
+   ```
+   sudo apt update
+   sudo apt install libxcb-cursor0
+   ´´´
+
+4. **Runing**:
+   Para rodar é só ativar o venv com:
+   ```
+   source .venv/bin/activate
+   ´´´
+   Após isso, para o server:
+   ```
+   python server/server.py
+   ´´´
+   E para cada cliente:
+   ```
+   python client/main.py
+   ´´´
 ### Setting up Local Environment
 
 1. **Install uv** (if not already installed):
@@ -35,3 +55,10 @@ Projeto para disciplina de Redes de Computadores com o objetivo de desenvolver u
    ```bash
    uv sync
    ```
+
+
+5. **Logins**:
+   Logins disponíveis
+   - user: pedro, password: 1234
+   - user: alice, password: 1234
+   - user: felipe, password: 1234

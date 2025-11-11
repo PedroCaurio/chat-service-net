@@ -16,14 +16,7 @@ from services.chat_general import send_general_message
 import client_registry 
 import json
 
-# User Actions
-
-
-@register_command("register")
-def register(username: str, password: str):
-    return UserRepository.add_user(
-        User(username=username, password=password, user_id=str(uuid.uuid4()))
-    )
+# ---- COMANDOS IMPLEMENTADOS -----
 
 @register_command("login")
 def login(username: str, password: str, conn):
@@ -41,6 +34,91 @@ def login(username: str, password: str, conn):
     }
 
 
+@register_command("message")
+def message(origin, destiny, message):
+    print("messagee")
+    receiver = destiny
+    text = message
+    if receiver and text:
+        target_obj = UserRepository.get_user_by_id(receiver)
+        if target_obj is None:
+            target_obj = UserRepository.get_user_by_username(receiver)
+        if target_obj is None:
+            return {"status": "error", "message": "Usuário não encontrado"}
+        origin_obj = UserRepository.get_user_by_username(origin)
+        receiver_id = target_obj.user_id
+        origin_id = origin_obj.user_id
+        print("origem:", origin_id, "destino: ", receiver_id)
+        ok = send_private_message(origin_id, receiver_id, text)
+        if ok:
+            msg = Message(from_=origin_id, to=receiver_id, text=text)
+            payload = json.dumps({"type": "private_message", "payload": {"origin": origin, "destiny": destiny, "message": msg.to_dict()}}, ensure_ascii=False).encode("utf-8")
+            print("enviou?", client_registry.send_to_user(receiver_id, payload))
+            return {"type": "private_message", "payload": {"origin": origin, "destiny": destiny, "message": msg.to_dict()}}
+        else:
+            return {"status": "error", "message": "Falha ao persistir/enviar mensagem"}
+   
+
+
+@register_command("get_all_users")
+def get_all_users() -> list[User]:
+    return UserRepository.get_all_users()
+def send_private_message(sender_id: str, receiver_id: str, message: str) -> bool:
+    return chat_private.send_private_message(sender_id, receiver_id, message)
+
+
+
+@register_command("create_group")
+def create_group(admin: str, name: str, users: list[str]) -> bool:
+    return GroupRepository.add_group(
+        Group(
+            name=name,
+            admin=admin,
+            users=users,
+            created_at=datetime.now().timestamp(),
+            group_id=str(uuid.uuid4())
+        )
+    )
+
+
+
+@register_command("group")
+def group(group_name, new_user, user_id):
+    group = GroupRepository.get_group_by_name(group_name)
+    if not group:
+        new_group = Group(admin=user_id, users=[user_id], name=group_name, group_id=group_name)
+        GroupRepository.add_group(new_group)
+    GroupRepository.add_user_to_group(group_name, new_user)
+
+@register_command("general_message")
+def general_message(origin, message):
+    user_id = UserRepository.get_user_by_username(origin).user_id
+    text = message
+    if text:
+        msg = send_general_message(user_id, text)
+        if msg:
+            payload = json.dumps({"type": "general_message", "payload": {"origin": origin, "message": msg.to_dict()}}, ensure_ascii=False).encode("utf-8")
+            for uid in client_registry.list_online():
+                if uid != user_id:
+                    try:
+                        client_registry.send_to_user(uid, payload)
+                    except Exception:
+                        pass
+            return {"type": "general_message", "payload": {"origin": origin, "message": msg.to_dict()}}
+        else:
+            return {"status": "error", "message": "Falha ao persistir mensagem"}
+
+
+
+
+# ----- COMANDOS NÃO IMPLEMENTADOS (BUA BUA) -----
+
+def sync():
+    ... 
+
+
+
+
 @register_command("get_user")
 def get_user(user_id: str) -> User | None:
     return UserRepository.get_user_by_id(user_id)
@@ -55,24 +133,10 @@ def update_user(new_user: dict) -> bool:
 def delete_user(user_id: str) -> bool:
     return UserRepository.delete_user_by_id(user_id)
 
-
-def send_private_message(sender_id: str, receiver_id: str, message: str) -> bool:
-    return chat_private.send_private_message(sender_id, receiver_id, message)
-
-
-# User - Group Actions
-
-
-@register_command("create_group")
-def create_group(admin: str, name: str, users: list[str]) -> bool:
-    return GroupRepository.add_group(
-        Group(
-            name=name,
-            admin=admin,
-            users=users,
-            created_at=datetime.now().timestamp(),
-            group_id=str(uuid.uuid4())
-        )
+@register_command("register")
+def register(username: str, password: str):
+    return UserRepository.add_user(
+        User(username=username, password=password, user_id=str(uuid.uuid4()))
     )
 
 
@@ -104,70 +168,3 @@ def kick_member(group_id: str, user_id: str) -> bool:
 @register_command("send_group_message")
 def send_group_message(sender_id: str, group_id: str, message: str) -> bool:
     return chat_private.send_group_message(sender_id, group_id, message)
-
-@register_command("group")
-def group(group_name, new_user, user_id):
-    print("group name:" ,group_name)
-    group = GroupRepository.get_group_by_name(group_name)
-    print(group)
-    if not group:
-        new_group = Group(admin=user_id, users=[user_id], name=group_name, group_id=group_name)
-        GroupRepository.add_group(new_group)
-    GroupRepository.add_user_to_group(group_name, new_user)
-
-    # Se grupo n existe, criar e inserir usuario
-
-    # Caso já exista, só insere o usuário
-
-@register_command("general_message")
-def general_message(origin, message):
-    user_id = UserRepository.get_user_by_username(origin).user_id
-    text = message
-    if text:
-        msg = send_general_message(user_id, text)
-        if msg:
-            payload = json.dumps({"type": "general_message", "payload": {"origin": origin, "message": msg.to_dict()}}, ensure_ascii=False).encode("utf-8")
-            for uid in client_registry.list_online():
-                if uid != user_id:
-                    try:
-                        client_registry.send_to_user(uid, payload)
-                    except Exception:
-                        pass
-            return {"type": "general_message", "payload": {"origin": origin, "message": msg.to_dict()}}
-        else:
-            return {"status": "error", "message": "Falha ao persistir mensagem"}
-
-@register_command("message")
-def message(origin, destiny, message):
-    print("messagee")
-    receiver = destiny
-    text = message
-    if receiver and text:
-        target_obj = UserRepository.get_user_by_id(receiver)
-        if target_obj is None:
-            target_obj = UserRepository.get_user_by_username(receiver)
-        if target_obj is None:
-            return {"status": "error", "message": "Usuário não encontrado"}
-        origin_obj = UserRepository.get_user_by_username(origin)
-        receiver_id = target_obj.user_id
-        origin_id = origin_obj.user_id
-        print("origem:", origin_id, "destino: ", receiver_id)
-        ok = send_private_message(origin_id, receiver_id, text)
-        if ok:
-            msg = Message(from_=origin_id, to=receiver_id, text=text)
-            payload = json.dumps({"type": "private_message", "payload": {"origin": origin, "destiny": destiny, "message": msg.to_dict()}}, ensure_ascii=False).encode("utf-8")
-            print("enviou?", client_registry.send_to_user(receiver_id, payload))
-            return {"type": "private_message", "payload": {"origin": origin, "destiny": destiny, "message": msg.to_dict()}}
-        else:
-            return {"status": "error", "message": "Falha ao persistir/enviar mensagem"}
-    pass
-# Misc/Test Actions
-
-
-@register_command("get_all_users")
-def get_all_users() -> list[User]:
-    return UserRepository.get_all_users()
-
-
-def sync():
-    ... # Placeholder for sync logic

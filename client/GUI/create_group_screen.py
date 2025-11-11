@@ -1,3 +1,7 @@
+'''
+Tela para criação dos grupos
+'''
+
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, 
     QLabel, QLineEdit, QPushButton, QMessageBox

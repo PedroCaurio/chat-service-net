@@ -1,7 +1,5 @@
-# FEITO COM GEMINI
-#
-#       TRABALHO EM ANDAMENTO - MTA IA AINDA
-#
+# Modelo do pyqt em sua maioria gerado com Gemini
+
 # client/GUI/chat_screen.py
 from PyQt6.QtWidgets import (
     QWidget, QHBoxLayout, QVBoxLayout, QListWidget, 
@@ -424,24 +422,7 @@ class ChatScreen(QWidget):
             {"type": "general", "id": "General"}, 
             "Chat com todos os usuários"
         )
-        '''
-        # Adiciona contatos fixos (exemplo)
-        self._add_chat_item(
-            {"type": "private", "id": "fulano"},
-            "Clique para conversar", 2
-        )
-        self._add_chat_item(
-            {"type": "private", "id": "ciclano"},
-            "Ok, obrigado!", 0
-        )
-        self._add_chat_item(
-            {"type": "group", "id": "Faculdade"},
-            "Trabalho amanhã?", 5
-        )
         
-        # Seleciona o "Geral" por padrão
-        self.contact_list.setCurrentItem(item_geral)
-        '''
 
 
     @pyqtSlot(list)
