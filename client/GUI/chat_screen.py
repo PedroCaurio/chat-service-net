@@ -11,6 +11,8 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import pyqtSignal, pyqtSlot, Qt, QSize, QTime
 from PyQt6.QtGui import QFont, QIcon
 
+from client_back.data_helper import data_helper, MessageType
+
 # ===================================================================
 # 1. CLASSE DE ESTILO (Para alterar as cores)
 # ===================================================================
@@ -348,6 +350,7 @@ class ChatScreen(QWidget):
 
         # 1. Adiciona a bolha localmente
         timestamp = QTime.currentTime().toString("HH:mm")
+        data_helper.store_message(message, MessageType.sent, self.user_id, target_id, timestamp)
         html = self._format_bubble(self.user_id, message, timestamp, is_sent=True)
         self.chat_display.append(html)
         self.message_input.clear()
@@ -377,7 +380,8 @@ class ChatScreen(QWidget):
         # Limpa o chat e reseta notificações
         self.chat_display.clear()
         self.current_chat_target["widget"].set_notifications(0) 
-        
+        self.load_chat(target_id)
+
         # Atualiza o visual de seleção na lista
         for i in range(self.contact_list.count()):
             item = self.contact_list.item(i)
@@ -387,6 +391,14 @@ class ChatScreen(QWidget):
             else:
                 widget.set_selected(False)
 
+
+    def load_chat(self, target_id):
+        if (data_helper.chats.get(target_id) != None):
+            for entry in data_helper.chats[target_id]:
+                html = self._format_bubble(entry["sender"], entry["message"], entry["timestamp"], is_sent=entry["sent"])
+                self.chat_display.append(html)
+        else:
+            data_helper.chats[target_id] = []
 
     # --- Slots para o ClientService ---
 
@@ -445,6 +457,7 @@ class ChatScreen(QWidget):
     def _add_message(self, target_id, sender, message, is_group=False):
         """ Lógica central para adicionar uma mensagem recebida """
         timestamp = QTime.currentTime().toString("HH:mm")
+        data_helper.store_message(message, MessageType.sent if sender == self.user_id else MessageType.received, sender, target_id, timestamp)
         
         # Atualiza o preview na lista da esquerda
         if target_id in self.chat_widgets:
@@ -466,6 +479,7 @@ class ChatScreen(QWidget):
         """ Adiciona mensagem privada (o ID do alvo é o sender) """
         print("\n\nmensagem privada: ", message)
         self._add_message(target_id=sender, sender=sender, message=message)
+
 
     @pyqtSlot(str, str, str)
     def add_group_message(self, group_id, sender, message):
