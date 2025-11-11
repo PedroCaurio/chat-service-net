@@ -1,7 +1,3 @@
-#
-#       TRABALHO EM ANDAMENTO - MTA IA AINDA
-#
-
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, 
     QLabel, QLineEdit, QPushButton, QMessageBox
@@ -10,7 +6,7 @@ from PyQt6.QtCore import pyqtSignal, Qt
 
 class LoginScreen(QWidget):
     login_requested = pyqtSignal(str, str)
-    registry_requested = pyqtSignal(str, str)
+    register_requested = pyqtSignal(str, str)
 
     def __init__(self):
         super().__init__()
@@ -66,8 +62,7 @@ class LoginScreen(QWidget):
         username = self.input_user.text()
         password = self.input_pass.text()
 
-        #self.register_requested.emit(username, password)
-        self.show_error("Registro ainda não implementado")
+        self.register_requested.emit(username, password)
         
     def show_error(self, message):
         QMessageBox.warning(self, "Erro", message)
