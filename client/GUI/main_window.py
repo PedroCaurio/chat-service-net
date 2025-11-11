@@ -5,6 +5,7 @@ Permite apenas uma tela por vez
 from PyQt6.QtWidgets import QMainWindow, QStackedWidget
 from .login_screen import LoginScreen
 from .chat_screen import ChatScreen
+from .create_group_screen import CreateGroupScreen
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -17,10 +18,15 @@ class MainWindow(QMainWindow):
 
         self.login_screen = LoginScreen()
         self.chat_screen = ChatScreen()
+        self.create_group_screen = CreateGroupScreen()
 
         self.stacked_widget.addWidget(self.login_screen)
         self.stacked_widget.addWidget(self.chat_screen)
-        
+        self.stacked_widget.addWidget(self.create_group_screen)
+
+        self.create_group_screen.return_requested.connect(self.show_chat_screen)
+        self.chat_screen.create_group.connect(self.show_create_group_screen)
+
         self.show_login_screen()
         #self.show_chat_screen("asfg") # Botei o user id que tinha no meu db
 
@@ -28,6 +34,10 @@ class MainWindow(QMainWindow):
     def show_login_screen(self):
         self.stacked_widget.setCurrentWidget(self.login_screen)
     
+    def show_create_group_screen(self):
+        self.stacked_widget.setCurrentWidget(self.create_group_screen)
+
     def show_chat_screen(self, user_id, users):
+        self.create_group_screen.associate_user(user_id, users)   
         self.chat_screen.load_user_data(user_id, users)
         self.stacked_widget.setCurrentWidget(self.chat_screen)

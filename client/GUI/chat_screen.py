@@ -131,6 +131,7 @@ class ChatScreen(QWidget):
     private_message_sended = pyqtSignal(str, str) # recipient, message
     group_message_sended = pyqtSignal(str, str)   # group_id, message
     general_message_sended = pyqtSignal(str)      # message
+    create_group = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -150,6 +151,16 @@ class ChatScreen(QWidget):
         left_layout.setContentsMargins(10, 10, 10, 10)
         left_layout.setSpacing(10)
         
+        commands_title = QLabel("Comandos")
+        font = commands_title.font()
+        font.setPointSize(16)
+        font.setBold(True)
+        commands_title.setFont(font)
+        
+        self.commands_list = QVBoxLayout()
+        self.create_group_btn = QPushButton("Criar grupo")
+        self.commands_list.addWidget(self.create_group_btn)
+
         list_title = QLabel("Mensagens")
         font = list_title.font()
         font.setPointSize(16)
@@ -172,6 +183,8 @@ class ChatScreen(QWidget):
         """)
         self.contact_list.setSpacing(5)
         
+        left_layout.addWidget(commands_title)
+        left_layout.addWidget(self.create_group_btn)
         left_layout.addWidget(list_title)
         left_layout.addWidget(self.contact_list)
 
@@ -250,6 +263,7 @@ class ChatScreen(QWidget):
         self.setLayout(main_layout)
 
         # Conexões internas
+        self.create_group_btn.clicked.connect(self.on_create_group_clicked)
         self.send_button.clicked.connect(self.on_send_clicked)
         self.message_input.returnPressed.connect(self.on_send_clicked)
         self.contact_list.currentItemChanged.connect(self.on_chat_selected)
@@ -320,6 +334,8 @@ class ChatScreen(QWidget):
         """
         return html
 
+    def on_create_group_clicked(self):
+        self.create_group.emit()
     def on_send_clicked(self):
         """
         Chamado para enviar uma mensagem.
@@ -375,6 +391,7 @@ class ChatScreen(QWidget):
             else:
                 widget.set_selected(False)
 
+
     def load_chat(self, target_id):
         if (data_helper.chats.get(target_id) != None):
             for entry in data_helper.chats[target_id]:
@@ -425,6 +442,7 @@ class ChatScreen(QWidget):
         # Seleciona o "Geral" por padrão
         self.contact_list.setCurrentItem(item_geral)
         '''
+
 
     @pyqtSlot(list)
     def update_user_list(self, users: list):
