@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
 
         self.stacked_widget.addWidget(self.login_screen)
         self.stacked_widget.addWidget(self.chat_screen)
-
+        
         self.show_login_screen()
         #self.show_chat_screen("asfg") # Botei o user id que tinha no meu db
 

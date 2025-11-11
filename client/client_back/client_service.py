@@ -7,6 +7,7 @@ from PyQt6.QtWidgets import QMessageBox, QMainWindow
 from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot, Qt, QThread
 from client_back.registry import get_command
 from client_back.services.login import login
+from client_back.data_helper import data_helper
 
 load_dotenv(dotenv_path="../.env")
 
@@ -119,6 +120,9 @@ class ClientService(QObject):
 
         # ---- Inicializa a Thread de recebimento dos dados ----
         self.worker.start()
+
+        if (data_helper.user.get("username", None) is not None):
+            main_window.login_screen.login_requested.emit(data_helper.user["username"], data_helper.user["password"])
         
     
     @pyqtSlot(bytes)
@@ -158,11 +162,11 @@ class ClientService(QObject):
 
     def handle_login(self, msg):
         #payload = msg.get("payload", {})
-        print(msg)
         if msg.get("type") == "login":
             if msg.get("payload").get("user_id"):
                 self.username = msg.get("payload").get("username") # Salva quem somos
                 self.login_sucess.emit(self.username, msg.get("payload").get("users"))
+                data_helper.user = {"username": self.username, "password": self.last_password}
             else:
                 self.login_failed.emit(msg.get("message", "Login falhou."))
 
@@ -219,6 +223,7 @@ class ClientService(QObject):
                 "password": password
             }
         }
+        self.last_password = password
         self.send_json(msg)
     
     @pyqtSlot(str, str)
