@@ -23,3 +23,20 @@ def do_login():
     if username and password:
         return login(username, password)
     return None
+
+@register_command("register")
+def register():
+
+    username = input("digite seu usuario: ")
+    password = input("digite sua senha: ")
+    
+    msg = {
+        "type": "request",
+        "payload": {
+            "command": "register",
+            "username": username,
+            "password": password
+        }
+    }
+
+    return msg
