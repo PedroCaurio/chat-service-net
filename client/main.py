@@ -1,7 +1,7 @@
 import sys
 from PyQt6.QtWidgets import QApplication
-from client_service import ClientService 
-from gui.main_window import MainWindow
+from client_back.client_service import ClientService 
+from GUI.main_window import MainWindow
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

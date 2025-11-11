@@ -5,11 +5,13 @@ import sys
 from dotenv import load_dotenv
 from PyQt6.QtWidgets import QMessageBox, QMainWindow
 from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot, Qt, QThread
+from client_back.registry import get_command
+from client_back.services.login import login
 
 load_dotenv(dotenv_path="../.env")
 
 class NetworkWorker(QThread):
-    data_received = pyqtSignal(bytes)
+    data_received = pyqtSignal( bytes)
     disconnected = pyqtSignal()
 
     def __init__(self, host, port):
@@ -21,6 +23,7 @@ class NetworkWorker(QThread):
 
     def run(self):
         try:
+            print("tentando conexao")
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.connect((self.host, self.port))
         except Exception as e:
@@ -32,6 +35,8 @@ class NetworkWorker(QThread):
                 data = self.sock.recv(4096)
                 if not data:
                     break
+                print(type(self.sock), data)
+
                 self.data_received.emit(data)
         except Exception as e:
             print(f"Ocorreu um erro ao interceptar o pacote enviado pelo server: {e}")
@@ -60,7 +65,7 @@ class ClientService(QObject):
     # --- Sinais para a GUI ---
     # Sinais de conexão e login
     connection_error = pyqtSignal(str)
-    login_sucess = pyqtSignal(str) # Envia o user_id ou nome
+    login_sucess = pyqtSignal(str, dict) # Envia o user_id ou nome
     login_failed = pyqtSignal(str)
     server_disconnected = pyqtSignal()
 
@@ -90,6 +95,8 @@ class ClientService(QObject):
         self.server_disconnected.connect(on_disconnect)
         main_window.login_screen.login_requested.connect(self.try_login)
         main_window.login_screen.register_requested.connect(self.try_register)
+
+        # --- Conexão de Login com main_window ---
         self.login_sucess.connect(main_window.show_chat_screen)
         self.login_sucess.connect(main_window.chat_screen.load_user_data)
         self.login_failed.connect(main_window.login_screen.show_error)
@@ -115,13 +122,21 @@ class ClientService(QObject):
         
     
     @pyqtSlot(bytes)
-    def handle_data(self, data):
+    def handle_data(self,data):
+        '''
+            Função para tratar o recebimento das mensagens. 
+        '''
         for msg_str in self.decode_messages(data):
             try:
                 msg = json.loads(msg_str)
-                msg_type = msg.get("type", "")
-                func = 'handle_' + msg_type
-                getattr(self, func, lambda _: print(f"Tipo de mensagem não tratada: {msg_type}"))(msg)
+                command = msg.get("type")
+                args = msg.get("payload")
+                print("mensagem recebida:", msg)
+                func = 'handle_' + command
+                try:
+                    getattr(self, func)(**args)
+                except:
+                    getattr(self, func, lambda _: print(f"Tipo de mensagem não tratada: {command}"))(msg)
             except json.JSONDecodeError:
                 print(f"JSON inválido recebido: {msg_str}")
     
@@ -135,28 +150,29 @@ class ClientService(QObject):
         então vamos assumir que o servidor faz o mesmo.
         """
         buffer = data.decode('utf-8')
-        # Se seus colegas não usam '\n' como delimitador,
-        # você terá que ajustar essa lógica (ex: JSONL)
         for msg in buffer.strip().split('\n'):
             if msg:
                 yield msg
 
 
-    def handle_response(self, msg: dict):
-        payload = msg.get("payload", {})
-        if msg.get("command") == "login":
-            if msg.get("status") == "success":
-                self.user_id = payload.get("username", "user") # Salva quem somos
-                self.login_sucess.emit(self.user_id)
+
+    def handle_login(self, msg):
+        #payload = msg.get("payload", {})
+        print(msg)
+        if msg.get("type") == "login":
+            if msg.get("payload").get("user_id"):
+                self.username = msg.get("payload").get("username") # Salva quem somos
+                self.login_sucess.emit(self.username, msg.get("payload").get("users"))
             else:
                 self.login_failed.emit(msg.get("message", "Login falhou."))
 
     def handle_private_message(self, msg: dict):
         payload = msg.get("payload", {})
         # Mensagem privada recebida
+        print("mensagem privada recebida", msg)
         self.new_private_message.emit(
-            payload.get("sender"), 
-            payload.get("body")
+            payload.get("origin"), 
+            payload.get("message").get("text")
         )
         
     def handle_group_message(self, msg: dict):
@@ -166,7 +182,13 @@ class ClientService(QObject):
             payload.get("sender"), 
             payload.get("body")
         )
-    
+    def handle_general_message(self, msg:dict):
+        payload = msg.get("payload", {})
+        self.new_general_message.emit(
+            payload.get("origin"),
+            payload.get("message").get("text")
+        )
+
     def handle_user_list(self, msg: dict):
         payload = msg.get("payload", {})
         self.user_list_updated.emit(payload.get("users", []))
@@ -191,14 +213,12 @@ class ClientService(QObject):
         """Slot para receber o sinal de login da LoginScreen."""
         # Formato baseado no `client_back/services/login.py`
         msg = {
-            "type": "request",
+            "type": "login",
             "payload": {
-                "command": "login",
                 "username": username,
                 "password": password
             }
         }
-        print(msg)
         self.send_json(msg)
     
     @pyqtSlot(str, str)
@@ -219,10 +239,14 @@ class ClientService(QObject):
     def send_private_message(self, recipient_user, message):
         """Slot para enviar uma mensagem privada."""
         # Formato baseado no `client.py`
+        print(self.username)
         msg = {
-            "type": "private", 
-            "to": recipient_user, 
-            "message": message
+            "type": "message",
+            "payload": { 
+                "origin": self.username,
+                "destiny": recipient_user, 
+                "message": message
+            }
         }
         self.send_json(msg)
 
@@ -242,7 +266,13 @@ class ClientService(QObject):
         """Slot para enviar uma mensagem geral/broadcast."""
         # Formato baseado no `client.py`
         msg = {
-            "type": "general", 
-            "message": message
+            "type": "general_message",
+            "payload": { 
+                "origin": self.username,
+                "message": message
+            }
         }
         self.send_json(msg)
+
+def send_json(sock, data):
+    sock.sendall(json.dumps(data).encode())

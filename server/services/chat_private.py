@@ -13,6 +13,7 @@ def conversation_id(a: str, b: str) -> str:
 def send_private_message(sender_id: str, receiver_id: str, text: str) -> bool:
     """Valida usuários e persiste a mensagem (retorna True se OK)."""
     # valida existência dos usuários via repositório
+    print(sender_id, receiver_id)
     if not UserRepository.get_user_by_id(sender_id):
         return False
     if not UserRepository.get_user_by_id(receiver_id):

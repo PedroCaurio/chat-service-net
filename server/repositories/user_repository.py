@@ -60,7 +60,12 @@ class UserRepository:
     def get_all_users() -> list[User]:
         with locked_db():
             results = UserRepository._user_db().all()
-        return [User.from_dict(data) for data in results]
+        ret = {}
+        print(results)
+        for data in results:
+            ret[data["username"]] = "clique para conversar" # Depois temos que trocar esse clique para conversar pela ultima msg
+            
+        return ret
 
     @staticmethod
     def user_exists(username: str) -> bool:
@@ -85,5 +90,6 @@ class UserRepository:
                 (UserQ.password == password)
             )
         if result:
+            print("autenticação do usuário")
             return User.from_dict(result)
         return None

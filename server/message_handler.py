@@ -16,7 +16,7 @@ def handle_message(user_id: str, envelope: dict, conn) -> Optional[dict]:
     chama os serviços de domínio (chat_general/chat_private/chat_groups).
     Retorna um dict de resposta ou None.
     """
-    print(envelope)
+    print("envelope:", envelope)
     try:
         msg_type = envelope.get("type", "general")
         if msg_type == "general":

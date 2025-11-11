@@ -6,12 +6,15 @@ pode executar.
 import uuid
 from models.user import User
 from models.group import Group
+from models import Message
 from repositories import UserRepository, GroupRepository
 from datetime import datetime
 
 from registry import register_command
 import services.chat_private as chat_private
-
+from services.chat_general import send_general_message
+import client_registry 
+import json
 
 # User Actions
 
@@ -23,13 +26,18 @@ def register(username: str, password: str):
     )
 
 @register_command("login")
-def login(username: str, password: str):
+def login(username: str, password: str, conn):
     user = UserRepository.authenticate_user(username=username, password=password)
+    client_registry.register_client(user.user_id, conn)
     if not user:
         return None
     return {
-        "command" : "login",
-        "user_id" : user.user_id
+        "type" : "login",
+        "payload": {
+            "user_id" : user.user_id,
+            "username": user.username,
+            "users": get_all_users()
+        }
     }
 
 
@@ -97,7 +105,48 @@ def kick_member(group_id: str, user_id: str) -> bool:
 def send_group_message(sender_id: str, group_id: str, message: str) -> bool:
     return chat_private.send_group_message(sender_id, group_id, message)
 
+@register_command("general_message")
+def general_message(origin, message):
+    user_id = UserRepository.get_user_by_username(origin).user_id
+    text = message
+    if text:
+        msg = send_general_message(user_id, text)
+        if msg:
+            payload = json.dumps({"type": "general_message", "payload": {"origin": origin, "message": msg.to_dict()}}, ensure_ascii=False).encode("utf-8")
+            for uid in client_registry.list_online():
+                if uid != user_id:
+                    try:
+                        client_registry.send_to_user(uid, payload)
+                    except Exception:
+                        pass
+            return {"type": "general_message", "payload": {"origin": origin, "message": msg.to_dict()}}
+        else:
+            return {"status": "error", "message": "Falha ao persistir mensagem"}
 
+@register_command("message")
+def message(origin, destiny, message):
+    print("messagee")
+    receiver = destiny
+    text = message
+    if receiver and text:
+        target_obj = UserRepository.get_user_by_id(receiver)
+        if target_obj is None:
+            target_obj = UserRepository.get_user_by_username(receiver)
+        if target_obj is None:
+            return {"status": "error", "message": "Usuário não encontrado"}
+        origin_obj = UserRepository.get_user_by_username(origin)
+        receiver_id = target_obj.user_id
+        origin_id = origin_obj.user_id
+        print("origem:", origin_id, "destino: ", receiver_id)
+        ok = send_private_message(origin_id, receiver_id, text)
+        if ok:
+            msg = Message(from_=origin_id, to=receiver_id, text=text)
+            payload = json.dumps({"type": "private_message", "payload": {"origin": origin, "destiny": destiny, "message": msg.to_dict()}}, ensure_ascii=False).encode("utf-8")
+            print("enviou?", client_registry.send_to_user(receiver_id, payload))
+            return {"type": "private_message", "payload": {"origin": origin, "destiny": destiny, "message": msg.to_dict()}}
+        else:
+            return {"status": "error", "message": "Falha ao persistir/enviar mensagem"}
+    pass
 # Misc/Test Actions
 
 

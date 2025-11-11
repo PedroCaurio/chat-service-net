@@ -373,19 +373,29 @@ class ChatScreen(QWidget):
 
     # --- Slots para o ClientService ---
 
-    @pyqtSlot(str)
-    def load_user_data(self, user_id):
+    @pyqtSlot(str, dict)
+    def load_user_data(self, user_id, users):
         """ Configura a tela de chat após o login. """
         self.user_id = user_id
         self.contact_list.clear()
         self.chat_widgets.clear()
+        
+        for user in users:
+            if user != user_id:
+                self._add_chat_item(
+                    {
+                    "type": "private", 
+                    "id": user,
+                    },
+                    users[user] # ultima mensagem
+                )
         
         # Adiciona o chat "Geral" como placeholder
         item_geral = self._add_chat_item(
             {"type": "general", "id": "General"}, 
             "Chat com todos os usuários"
         )
-        
+        '''
         # Adiciona contatos fixos (exemplo)
         self._add_chat_item(
             {"type": "private", "id": "fulano"},
@@ -402,6 +412,7 @@ class ChatScreen(QWidget):
         
         # Seleciona o "Geral" por padrão
         self.contact_list.setCurrentItem(item_geral)
+        '''
 
     @pyqtSlot(list)
     def update_user_list(self, users: list):
@@ -435,6 +446,7 @@ class ChatScreen(QWidget):
     @pyqtSlot(str, str)
     def add_private_message(self, sender, message):
         """ Adiciona mensagem privada (o ID do alvo é o sender) """
+        print("\n\nmensagem privada: ", message)
         self._add_message(target_id=sender, sender=sender, message=message)
 
     @pyqtSlot(str, str, str)

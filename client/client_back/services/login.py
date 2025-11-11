@@ -1,12 +1,11 @@
 import json
-from registry import register_command
+from client_back.registry import register_command
 
 ''' Função para formatar a entrada do usuário '''
-def login(username: str, password: str):
+def format_login(username: str, password: str):
     msg = {
-        "type": "request",
+        "type": "login",
         "payload": {
-            "command": "login",
             "username": username,
             "password": password
         }
@@ -16,10 +15,16 @@ def login(username: str, password: str):
 
 ''' Comando para realizaar o login e retornar o json formatado'''
 @register_command("login")
-def do_login():
-    username = input("digite seu usuario: ")
-    password = input("digite sua senha: ")
+def login(username, password):
+    #username = input("digite seu usuario: ")
+    #password = input("digite sua senha: ")
 
     if username and password:
-        return login(username, password)
+        return format_login(username, password)
     return None
+
+@register_command("receive_login")
+def receive_login(user_id):
+    if user_id:
+        return True
+    return False

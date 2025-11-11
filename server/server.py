@@ -1,3 +1,8 @@
+'''
+Script que apenas faz o bind com a porta e cria thread para cada nova conexão. A função executada
+por cada thread é a handle_connection do script connection_manager
+'''
+
 import socket
 import os
 from dotenv import load_dotenv
@@ -15,15 +20,14 @@ def start_server():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((HOST, PORT))
         s.listen()
+
         print(f"Servidor escutando em {HOST}:{PORT}")
 
         while True:
             # loop principal
             conn, addr = s.accept()
             print(f"Nova conexão de {addr}")
-            # encaminha a conexão para o connection_manager, que cria/roda o handler em thread
-            thread = threading.Thread(target=handle_connection, args=(conn, addr))
-            thread.daemon = True
+            thread = threading.Thread(target=handle_connection, args=(conn, addr), daemon=True)
             thread.start()
 
 if __name__ == "__main__":
